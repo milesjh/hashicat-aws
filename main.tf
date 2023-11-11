@@ -16,7 +16,7 @@ resource "aws_vpc" "hashicat" {
   enable_dns_hostnames = true
 
   tags = {
-    name        = "${var.prefix}-vpc-${var.region}"
+    name        = "${var.name}-vpc-${var.region}"
     environment = "Production"
   }
 }
@@ -26,12 +26,12 @@ resource "aws_subnet" "hashicat" {
   cidr_block = var.subnet_prefix
 
   tags = {
-    name = "${var.prefix}-subnet"
+    name = "${var.name}-subnet"
   }
 }
 
 resource "aws_security_group" "hashicat" {
-  name = "${var.prefix}-security-group"
+  name = "${var.name}-security-group"
 
   vpc_id = aws_vpc.hashicat.id
 
@@ -65,12 +65,12 @@ resource "aws_security_group" "hashicat" {
   }
 
   tags = {
-    Name = "${var.prefix}-security-group"
+    Name = "${var.name}-security-group"
   }
 }
 
 resource "random_id" "app-server-id" {
-  prefix      = "${var.prefix}-hashicat-"
+  prefix      = "${var.name}-hashicat-"
   byte_length = 8
 }
 
@@ -78,7 +78,7 @@ resource "aws_internet_gateway" "hashicat" {
   vpc_id = aws_vpc.hashicat.id
 
   tags = {
-    Name = "${var.prefix}-internet-gateway"
+    Name = "${var.name}-internet-gateway"
   }
 }
 
@@ -132,7 +132,7 @@ resource "aws_instance" "hashicat" {
   vpc_security_group_ids      = [aws_security_group.hashicat.id]
 
   tags = {
-    Name       = "${var.prefix}-hashicat-instance"
+    Name       = "${var.name}-hashicat-instance"
     Department = "devops"
     Billable   = "true"
   }
@@ -178,7 +178,7 @@ resource "null_resource" "configure-cat-app" {
       "sudo systemctl start apache2",
       "sudo chown -R ubuntu:ubuntu /var/www/html",
       "chmod +x *.sh",
-      "PLACEHOLDER=${var.placeholder} WIDTH=${var.width} HEIGHT=${var.height} PREFIX=${var.prefix} ./deploy_app.sh",
+      "PLACEHOLDER=${var.placeholder} WIDTH=${var.width} HEIGHT=${var.height} PREFIX=${var.name} ./deploy_app.sh",
       "sudo apt -y install cowsay",
       "cowsay Mooooooooooo!",
     ]
